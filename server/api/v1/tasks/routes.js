@@ -6,6 +6,7 @@ const controller = require("./controller");
 /*
  * /api/v1/tasks       POST Create
  * /api/vi/tasks       GET Read all
+ * /api/v1/tasks/:id   GET Read
  * /api/v1/tasks/:id   PATCH Update
  * /api/v1/tasks/:id   DELETE  Delete
  */
