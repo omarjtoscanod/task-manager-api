@@ -105,6 +105,17 @@ Returns all the elements of the list, without the deleted element
 Request: PATCH or PUT
 URL: http://server:port/api/v1/tasks/:id
 Parameter: id -> Numeric value that refers to the index of the element within the array
+
+Data to update in json format
+
+```
+{
+    "description": Description to update,
+    "author": Author to update,
+    "creadeAt": Creation date to update
+}
+```
+
 Response:
 
      {
