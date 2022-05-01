@@ -37,27 +37,32 @@ exports.all = async (req, res, next) => {
   }
 };
 
-exports.read = (req, res, next) => {
+exports.id = async (req, res, next) => {
   const { params = {} } = req;
+  const { id = "" } = params;
 
-  if (isNaN(params.id)) {
-    next({
-      message: "Task identifier must be numeric",
-      status: 400,
-    });
-  } else if (params.id > tasks.length) {
-    next({
-      message: "The required information does not exist",
-      status: 400,
-    });
-  } else {
-    const id = params.id == 0 ? params.id : params.id - 1;
-    const data = tasks[id];
-    res.json({
-      status: 200,
-      data,
-    });
+  try {
+    const data = await Model.findById(id).exec();
+
+    if (data) {
+      req.doc = data;
+    } else {
+      next({
+        statusCode: 404,
+        message: "Document not found",
+      });
+    }
+  } catch (error) {
+    next(error);
   }
+};
+
+exports.read = (req, res, next) => {
+  const { doc = {} } = req;
+
+  res.json({
+    data: doc,
+  });
 };
 
 exports.update = async (req, res, next) => {
