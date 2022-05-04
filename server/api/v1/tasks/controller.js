@@ -35,7 +35,6 @@ exports.all = async (req, res, next) => {
     ]);
 
     res.json({
-      status: 200,
       data,
       meta: {
         total,
