@@ -5,11 +5,11 @@ const controller = require('./controller');
 const { sanitizers } = require('./model');
 
 /*
- * /api/v1/tasks       POST Create
- * /api/vi/tasks       GET Read all
- * /api/v1/tasks/:id   GET Read
- * /api/v1/tasks/:id   PATCH Update
- * /api/v1/tasks/:id   DELETE  Delete
+ * /api/v1/users       POST Create
+ * /api/vi/users       GET Read all
+ * /api/v1/users/:id   GET Read
+ * /api/v1/users/:id   PUT Update
+ * /api/v1/users/:id   PATCH Activation
  */
 
 router.route('/').get(controller.all).post(sanitizers, controller.create);
@@ -19,8 +19,7 @@ router.param('id', controller.id);
 router
   .route('/:id')
   .get(controller.read)
-  .patch(sanitizers, controller.update)
   .put(sanitizers, controller.update)
-  .delete(controller.delete);
+  .patch(controller.activation);
 
 module.exports = router;
