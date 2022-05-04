@@ -1,130 +1,103 @@
-const express = require("express");
+const { Model } = require("./model");
+const { paginationParseParams } = require("./../../../utils");
 
-const app = express();
-
-const dayjs = require("dayjs");
-
-const tasks = [];
-
-exports.create = (req, res, next) => {
+exports.create = async (req, res, next) => {
   const { body = {} } = req;
-  if (
-    typeof body.description == "undefined" ||
-    typeof body.author == "undefined" ||
-    body.description == "" ||
-    body.author == ""
-  ) {
-    next({
-      message: "Validate the structure of the submitted file",
-      status: 400,
-    });
-  } else {
-    const today = dayjs();
-    const date = today.format("YYYY-MM-DD h:mm:ss");
-    body.creadeAt = date;
-    body.updateAt = "";
-    tasks.push(body);
 
+  const document = new Model({
+    ...body,
+  });
+
+  try {
+    const data = await document.save();
+    res.status(201);
     res.json({
-      status: 200,
-      data: {
-        description: body.description,
-        author: body.author,
-        creadeAt: date,
-        updateAt: "",
-      },
+      data,
     });
+  } catch (error) {
+    next(error);
   }
 };
 
-exports.all = (req, res, next) => {
-  res.json({
-    status: 200,
-    data: tasks,
-  });
+exports.all = async (req, res, next) => {
+  const { query = {} } = req;
+  const { limit, skip } = paginationParseParams(query);
+
+  try {
+    const [data = []] = await Promise.all([
+      Model.find({}).limit(limit).skip(skip).exec(),
+    ]);
+
+    res.json({
+      status: 200,
+      data,
+      meta: {
+        limit,
+        skip,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.id = async (req, res, next) => {
+  const { params = {} } = req;
+  const { id = "" } = params;
+
+  try {
+    const data = await Model.findById(id).exec();
+
+    if (data) {
+      req.doc = data;
+      next();
+    } else {
+      next({
+        statusCode: 404,
+        message: "Document not found",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.read = (req, res, next) => {
-  const { params = {} } = req;
+  const { doc = {} } = req;
 
-  if (isNaN(params.id)) {
-    next({
-      message: "Task identifier must be numeric",
-      status: 400,
-    });
-  } else if (params.id > tasks.length) {
-    next({
-      message: "The required information does not exist",
-      status: 400,
-    });
-  } else {
-    const id = params.id == 0 ? params.id : params.id - 1;
-    const data = tasks[id];
-    res.json({
-      status: 200,
-      data,
-    });
-  }
-};
-
-exports.update = (req, res, next) => {
-  const { params = {} } = req;
-  if (isNaN(params.id)) {
-    next({
-      message: "Task identifier must be numeric",
-      status: 400,
-    });
-  } else if (params.id > tasks.length) {
-    next({
-      message: "The required information does not exist",
-      status: 400,
-    });
-  } else {
-    const today = dayjs();
-    const date = today.format("YYYY-MM-DD h:mm:ss");
-    const { body = {} } = req;
-
-    body.updateAt = date;
-    const id = params.id == 0 ? params.id : params.id - 1;
-    tasks[id] = body;
-    const data = tasks;
-    res.json({
-      status: 200,
-      data,
-    });
-  }
-};
-
-exports.delete = (req, res, next) => {
-  const { params = {} } = req;
-
-  if (isNaN(params.id)) {
-    next({
-      message: "Task identifier must be numeric",
-      status: 400,
-    });
-  } else if (params.id > tasks.length) {
-    next({
-      message: "The required information does not exist",
-      status: 400,
-    });
-  } else {
-    const id = params.id == 0 ? params.id : params.id - 1;
-    tasks.splice(id, 1);
-    const data = tasks;
-    res.json({
-      status: 200,
-      data,
-    });
-  }
-};
-
-app.use((err, req, res, next) => {
-  const { message = "", status = 500 } = err;
-
-  res.status(status);
   res.json({
-    statusCode: 400,
-    message,
+    data: doc,
   });
-});
+};
+
+exports.update = async (req, res, next) => {
+  const { body = {}, params = {} } = req;
+  const { id } = params;
+
+  try {
+    const data = await Model.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+    res.status(200);
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.delete = async (req, res, next) => {
+  const { params = {} } = req;
+  const { id } = params;
+
+  try {
+    const data = await Model.findByIdAndDelete(id);
+    res.status(204);
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
