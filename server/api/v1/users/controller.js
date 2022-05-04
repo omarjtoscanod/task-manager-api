@@ -38,6 +38,8 @@ exports.all = async (req, res, next) => {
       data,
       meta: {
         total,
+        limit,
+        skip,
       },
     });
   } catch (error) {
