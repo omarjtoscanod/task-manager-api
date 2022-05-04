@@ -9,8 +9,8 @@ const config = {
     password: process.env.DB_PASSWORD,
   },
   pagination: {
-    limit: 10,
-    skip: 0,
+    limit: process.env.DB_LIMIT,
+    skip: process.env.DB_SKIP,
   },
 };
 
