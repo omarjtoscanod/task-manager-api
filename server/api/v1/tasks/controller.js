@@ -31,7 +31,7 @@ exports.all = async (req, res, next) => {
 
     const [data = [], total = 0] = await Promise.all([
       Model.find({}).limit(limit).skip(skip).populate(populateFields).exec(),    
-      Model.countDocuments,
+      Model.countDocuments(),
     ]);
 
     res.json({

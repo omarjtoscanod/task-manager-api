@@ -1,3 +1,4 @@
+const { sort } = require("./../config");
 const config = require("./../config");
 
 const { pagination } = config;
@@ -12,6 +13,21 @@ const paginationParseParams = function ({
   };
 };
 
+const sortParseParams=function ({ sortBy, direction }, fields = {}) {
+  const sortBySafeList=[
+    ...Object.getOwnPropertyNames(fields),
+    ...sort.sortBy.fields,
+  ];
+  
+  return {
+    sortBy: sortBySafeList.includes(sortBy) ? sortBy : sort.sortBy.default,
+    direction: sort.direction.Option.includes(direction)
+      ? direction
+      : sort.direction.default,
+  };
+};
+
 module.exports = {
   paginationParseParams,
+  sortParseParams,
 };
