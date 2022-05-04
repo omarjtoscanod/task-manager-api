@@ -12,6 +12,19 @@ const config = {
     limit: process.env.DB_LIMIT,
     skip: process.env.DB_SKIP,
   },
+  
+  sort: {
+    sortBy:{
+      default: 'createdAt',
+      fields: [
+        'createdAt','updatedAt'
+      ]
+    },
+    direction:{
+      default:'desc',
+      Option:['desc','asc'],
+    },
+  },
 };
 
 module.exports = config;
