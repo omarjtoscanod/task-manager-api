@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
@@ -10,20 +10,22 @@ const tasks = {
     minlength: 1,
     maxlength: 255,
   },
+};
+
+const references = {
   author: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
-    trim: true,
-    minlength: 1,
-    maxlength: 255,
   },
 };
 
-const task = new Schema(tasks, {
+const task = new Schema(Object.assign({}, tasks, references), {
   timestamps: true,
 });
 
 module.exports = {
-  Model: mongoose.model("task", task),
+  Model: mongoose.model('task', task),
   task,
+  references,
 };
