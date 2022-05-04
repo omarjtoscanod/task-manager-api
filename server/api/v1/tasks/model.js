@@ -28,4 +28,5 @@ module.exports = {
   Model: mongoose.model('task', task),
   task,
   references,
+  tasks,
 };
