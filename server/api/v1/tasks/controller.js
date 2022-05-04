@@ -1,5 +1,5 @@
-const { Model } = require("./model");
-const { paginationParseParams } = require("./../../../utils");
+const { Model, references } = require('./model');
+const { paginationParseParams } = require('./../../../utils');
 
 exports.create = async (req, res, next) => {
   const { body = {} } = req;
@@ -9,7 +9,10 @@ exports.create = async (req, res, next) => {
   });
 
   try {
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
     const data = await document.save();
+    await data.populate(populateFields);
+
     res.status(201);
     res.json({
       data,
@@ -24,14 +27,18 @@ exports.all = async (req, res, next) => {
   const { limit, skip } = paginationParseParams(query);
 
   try {
-    const [data = []] = await Promise.all([
-      Model.find({}).limit(limit).skip(skip).exec(),
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+
+    const [data = [], total = 0] = await Promise.all([
+      Model.find({}).limit(limit).skip(skip).populate(populateFields).exec(),
+      Model.countDocuments,
     ]);
 
     res.json({
       status: 200,
       data,
       meta: {
+        total,
         limit,
         skip,
       },
@@ -43,10 +50,12 @@ exports.all = async (req, res, next) => {
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
-  const { id = "" } = params;
+  const { id = '' } = params;
 
   try {
-    const data = await Model.findById(id).exec();
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+
+    const data = await Model.findById(id).populate(populateFields).exec();
 
     if (data) {
       req.doc = data;
@@ -54,7 +63,7 @@ exports.id = async (req, res, next) => {
     } else {
       next({
         statusCode: 404,
-        message: "Document not found",
+        message: 'Document not found',
       });
     }
   } catch (error) {
@@ -77,7 +86,7 @@ exports.update = async (req, res, next) => {
   try {
     const data = await Model.findByIdAndUpdate(id, body, {
       new: true,
-    });
+    }).populate(populateFields);
     res.status(200);
     res.json({
       data,
@@ -92,7 +101,9 @@ exports.delete = async (req, res, next) => {
   const { id } = params;
 
   try {
-    const data = await Model.findByIdAndDelete(id);
+    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const data = await Model.findByIdAndDelete(id).populate(populateFields);
+
     res.status(204);
     res.json({
       data,
