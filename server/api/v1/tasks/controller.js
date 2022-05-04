@@ -1,4 +1,5 @@
 const { Model } = require("./model");
+const { paginationParseParams } = require("./../../../utils");
 
 exports.create = async (req, res, next) => {
   const { body = {} } = req;
@@ -19,17 +20,20 @@ exports.create = async (req, res, next) => {
 };
 
 exports.all = async (req, res, next) => {
+  const { query = {} } = req;
+  const { limit, skip } = paginationParseParams(query);
+
   try {
-    const [data = [], total = 0] = await Promise.all([
-      Model.find({}).exec(),
-      Model.countDocuments,
+    const [data = []] = await Promise.all([
+      Model.find({}).limit(limit).skip(skip).exec(),
     ]);
 
     res.json({
       status: 200,
       data,
       meta: {
-        total,
+        limit,
+        skip,
       },
     });
   } catch (error) {
