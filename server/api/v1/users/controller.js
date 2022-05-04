@@ -89,6 +89,7 @@ exports.update = async (req, res, next) => {
     try {
       const data = await Model.findByIdAndUpdate(doc.id, userUpdated, {
         new: true,
+        runValidators: true,
       });
 
       res.json({

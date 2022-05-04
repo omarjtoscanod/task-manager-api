@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
+const { body } = require('express-validator');
 
 const { Schema } = mongoose;
 
@@ -23,6 +25,14 @@ const fields = {
     required: true,
     trim: true,
     maxlength: 255,
+    validate: {
+      validator(value) {
+        return validator.isEmail(value);
+      },
+      message(props) {
+        return `'${props.value}' is not a valid email.`;
+      },
+    },
   },
 };
 
@@ -33,6 +43,12 @@ const protected = {
     required: true,
   },
 };
+
+const sanitizers = [
+  body('firstName').escape(),
+  body('lastName').escape(),
+  body('enabled').toBoolean(),
+];
 
 const user = new Schema(Object.assign({}, fields, protected), {
   timestamps: true,
@@ -51,4 +67,5 @@ user.virtual('fullName').get(function () {
 module.exports = {
   Model: mongoose.model('user', user),
   fields,
+  sanitizers,
 };
