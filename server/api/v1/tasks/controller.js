@@ -46,6 +46,7 @@ exports.id = async (req, res, next) => {
 
     if (data) {
       req.doc = data;
+      next();
     } else {
       next({
         statusCode: 404,
