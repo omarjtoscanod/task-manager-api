@@ -1,5 +1,6 @@
 const { fields, Model } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
+const { signToken } = require('../auth');
 
 exports.signin = async (req, res, next) => {
   const { body = {} } = req;
@@ -10,8 +11,16 @@ exports.signin = async (req, res, next) => {
   if (document) {
      const verified = await document.verifyPassword(password);
      if (verified) {
+       const payload = {
+         id: document._id
+       }  
+       const token =signToken(payload)
+
        res.json({
          data: document,
+         meta: {
+           token,
+         }
        });
      } else {
        next ({

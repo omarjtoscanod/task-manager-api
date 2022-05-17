@@ -64,8 +64,8 @@ const user = new Schema(Object.assign({}, fields, protected), {
     virtuals: true,
   },
   toObject: {
-    virtuals: true,
-  },
+    virtuals: true
+  }
 });
 
 user.virtual('fullName').get(function () {
@@ -81,6 +81,12 @@ user.pre('save', async function (next) {
 
 user.methods.verifyPassword = function (password) {
    return compare (password , this.password);
+};
+
+user.methods.toJSON = function () {
+  const doc = this.toObject ();
+  delete doc.password;
+  return doc;
 };
 
 module.exports = {
