@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const { body } = require('express-validator');
-
+const { hash, compare} =require ('bcryptjs');
 const { Schema } = mongoose;
 
 const fields = {
@@ -19,6 +19,12 @@ const fields = {
     minlength: 1,
     maxlength: 32,
   },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6,
+    maxlength: 16,
+  },
   email: {
     type: String,
     unique: true,
@@ -34,6 +40,7 @@ const fields = {
       },
     },
   },
+  
 };
 
 const protected = {
@@ -47,6 +54,7 @@ const protected = {
 const sanitizers = [
   body('firstName').escape(),
   body('lastName').escape(),
+  body('password').escape(),
   body('enabled').toBoolean(),
 ];
 
@@ -63,6 +71,13 @@ const user = new Schema(Object.assign({}, fields, protected), {
 user.virtual('fullName').get(function () {
   return this.firstName + ' ' + this.lastName;
 });
+
+user.pre('save', async function (next) {
+  if (this.isnew || this.isModified('password')){
+    this.password = await hash(this.password, 10)
+  }
+  next ();
+})
 
 module.exports = {
   Model: mongoose.model('user', user),

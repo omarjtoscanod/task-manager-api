@@ -3,12 +3,13 @@ const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
 exports.create = async (req, res, next) => {
   const { body } = req;
-  const { firstName = '', lastName = '', email = '' } = body;
+  const { firstName = '', lastName = '', email = '',password = '' } = body;
 
   const user = {
     firstName,
     lastName,
     email,
+    password,
   };
 
   const document = new Model(user);

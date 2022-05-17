@@ -12,6 +12,7 @@ const { sanitizers } = require('./model');
  * /api/v1/users/:id   PATCH Activation
  */
 
+
 router.route('/').get(controller.all).post(sanitizers, controller.create);
 
 router.param('id', controller.id);
