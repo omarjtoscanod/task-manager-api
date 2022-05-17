@@ -1,21 +1,22 @@
 const { fields, Model } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
+const { signToken } = require('./../auth/controller');
 
 exports.create = async (req, res, next) => {
   const { body } = req;
-  const { firstName = '', lastName = '', email = '' } = body;
+  const { firstName = '', lastName = '', email = '', password = '' } = body;
 
   const user = {
     firstName,
     lastName,
     email,
+    password,
   };
 
   const document = new Model(user);
 
   try {
-    const data = await document.save();
-    res.status(201);
+    const data = await document.save({ validateBeforeSave: true });
     res.json({
       data,
     });
@@ -31,11 +32,13 @@ exports.all = async (req, res, next) => {
 
   try {
     const [data = [], total = 0] = await Promise.all([
-      Model.find({}).limit(limit).skip(skip)
-      .sort({
-        [sortBy]: direction
-      })
-      .exec(),
+      Model.find({})
+        .limit(limit)
+        .skip(skip)
+        .sort({
+          [sortBy]: direction,
+        })
+        .exec(),
       Model.countDocuments(),
     ]);
 
@@ -105,6 +108,7 @@ exports.update = async (req, res, next) => {
         runValidators: true,
       });
 
+      res.statusCode(201);
       res.json({
         data,
       });
@@ -141,5 +145,43 @@ exports.activation = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
+  }
+};
+
+exports.signIn = async (req, res, next) => {
+  const { body = {} } = req;
+  const { username = '', password = '' } = body;
+
+  const document = await Model.findOne({ username });
+
+  if (document) {
+    const userIsEnabled = document.enabled;
+
+    if (userIsEnabled === false) {
+      return next({ message: 'User is not enabled.', statusCode: 401 });
+    }
+
+    const verified = await document.verifyPassword(password);
+    if (verified) {
+      const payload = {
+        id: document._id,
+      };
+      const token = signToken(payload);
+
+      res.json({
+        data: document,
+        meta: {
+          token,
+        },
+      });
+    } else {
+      next({
+        message: 'Username or password are incorrect',
+      });
+    }
+  } else {
+    next({
+      message: 'Username or password are incorrect',
+    });
   }
 };

@@ -1,7 +1,8 @@
-const express = require("express");
+const express = require('express');
 // eslint-disable-next-line
 const router = express.Router();
-const controller = require("./controller");
+const controller = require('./controller');
+const auth = require('./../auth/controller');
 
 /*
  * /api/v1/tasks       POST Create
@@ -11,15 +12,15 @@ const controller = require("./controller");
  * /api/v1/tasks/:id   DELETE  Delete
  */
 
-router.route("/").get(controller.all).post(controller.create);
+router.route('/').get(controller.all).post(auth.auth, controller.create);
 
-router.param("id", controller.id);
+router.param('id', controller.id);
 
 router
-  .route("/:id")
+  .route('/:id')
   .get(controller.read)
-  .patch(controller.update)
-  .put(controller.update)
-  .delete(controller.delete);
+  .patch(auth.auth, auth.owner, controller.update)
+  .put(auth.auth, auth.owner, controller.update)
+  .delete(auth.auth, auth.owner, controller.delete);
 
 module.exports = router;
