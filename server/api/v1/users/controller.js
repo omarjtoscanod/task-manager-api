@@ -1,7 +1,32 @@
 const { fields, Model } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
-exports.create = async (req, res, next) => {
+exports.signin = async (req, res, next) => {
+  const { body = {} } = req;
+  const { email ='' , password } = body;
+
+  const document = await Model.findOne({ email });
+
+  if (document) {
+     const verified = await document.verifyPassword(password);
+     if (verified) {
+       res.json({
+         data: document,
+       });
+     } else {
+       next ({
+       message :'Email or Password are Incorrect...'
+       });
+    }
+  } else {
+   next ({
+    message :'Email or Password are Incorrect...'
+   });
+  }
+
+};
+
+exports.signup = async (req, res, next) => {
   const { body } = req;
   const { firstName = '', lastName = '', email = '',password = '' } = body;
 

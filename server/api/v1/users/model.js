@@ -79,6 +79,10 @@ user.pre('save', async function (next) {
   next ();
 })
 
+user.methods.verifyPassword = function (password) {
+   return compare (password , this.password);
+};
+
 module.exports = {
   Model: mongoose.model('user', user),
   fields,
