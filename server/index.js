@@ -1,7 +1,22 @@
 const express = require("express");
+const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 const api = require("./api/v1");
 
 const app = express();
+
+// cors
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
+// Add unique ID to every request
+app.use((req, res, next) => {
+  req.id = uuidv4();
+  next();
+});
 
 // parse application/json
 app.use(express.json());
