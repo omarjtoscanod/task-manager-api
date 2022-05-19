@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 
 const config = {
   port: process.env.PORT,
@@ -12,18 +12,20 @@ const config = {
     limit: process.env.DB_LIMIT,
     skip: process.env.DB_SKIP,
   },
-  
+
   sort: {
-    sortBy:{
+    sortBy: {
       default: 'createdAt',
-      fields: [
-        'createdAt','updatedAt'
-      ]
+      fields: ['createdAt', 'updatedAt'],
     },
-    direction:{
-      default:'desc',
-      Option:['desc','asc'],
+    direction: {
+      default: 'desc',
+      Option: ['desc', 'asc'],
     },
+  },
+  token: {
+    secret: process.env.TOKEN_SECRET,
+    expires: process.env.TOKEN_EXPIRES,
   },
 };
 
