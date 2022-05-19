@@ -10,6 +10,10 @@ const tasks = {
     minlength: 1,
     maxlength: 255,
   },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
 };
 
 const references = {
