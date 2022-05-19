@@ -150,9 +150,9 @@ exports.activation = async (req, res, next) => {
 
 exports.signIn = async (req, res, next) => {
   const { body = {} } = req;
-  const { username = '', password = '' } = body;
+  const { email = '', password = '' } = body;
 
-  const document = await Model.findOne({ username });
+  const document = await Model.findOne({ email });
 
   if (document) {
     const userIsEnabled = document.enabled;
