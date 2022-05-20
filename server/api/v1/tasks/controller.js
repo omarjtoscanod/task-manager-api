@@ -25,12 +25,17 @@ exports.create = async (req, res, next) => {
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
+  const { userId = "", direction = "" } = query;
 
   try {
     const populateFields = Object.getOwnPropertyNames(references).join(" ");
-
     const [data = [], total = 0] = await Promise.all([
-      Model.find({}).limit(limit).skip(skip).populate(populateFields).exec(),
+      Model.find({ author: userId })
+        .limit(limit)
+        .skip(skip)
+        .sort(direction)
+        .populate(populateFields)
+        .exec(),
       Model.countDocuments(),
     ]);
 
