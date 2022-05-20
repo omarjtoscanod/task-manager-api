@@ -1,5 +1,5 @@
-const { Model, references } = require('./model');
-const { paginationParseParams } = require('./../../../utils');
+const { Model, references } = require("./model");
+const { paginationParseParams } = require("./../../../utils");
 
 exports.create = async (req, res, next) => {
   const { body = {} } = req;
@@ -9,7 +9,7 @@ exports.create = async (req, res, next) => {
   });
 
   try {
-    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const populateFields = Object.getOwnPropertyNames(references).join(" ");
     const data = await document.save();
     await data.populate(populateFields);
 
@@ -27,7 +27,7 @@ exports.all = async (req, res, next) => {
   const { limit, skip } = paginationParseParams(query);
 
   try {
-    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const populateFields = Object.getOwnPropertyNames(references).join(" ");
 
     const [data = [], total = 0] = await Promise.all([
       Model.find({}).limit(limit).skip(skip).populate(populateFields).exec(),
@@ -50,15 +50,16 @@ exports.all = async (req, res, next) => {
 
 exports.getUserTasks = async (req, res, next) => {
   const { params = {} } = req;
-  const { userId = '' } = params;
+  const { userId = "" } = params;
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
 
   try {
-    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const populateFields = Object.getOwnPropertyNames(references).join(" ");
 
     const [data = [], total = 0] = await Promise.all([
       Model.find({ author: userId })
+        .sort({ createdAt: "desc" })
         .limit(limit)
         .skip(skip)
         .populate(populateFields)
@@ -82,10 +83,10 @@ exports.getUserTasks = async (req, res, next) => {
 
 exports.id = async (req, res, next) => {
   const { params = {} } = req;
-  const { id = '' } = params;
+  const { id = "" } = params;
 
   try {
-    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const populateFields = Object.getOwnPropertyNames(references).join(" ");
 
     const data = await Model.findById(id).populate(populateFields).exec();
 
@@ -95,7 +96,7 @@ exports.id = async (req, res, next) => {
     } else {
       next({
         statusCode: 404,
-        message: 'Document not found',
+        message: "Document not found",
       });
     }
   } catch (error) {
@@ -114,7 +115,7 @@ exports.read = (req, res, next) => {
 exports.update = async (req, res, next) => {
   const { body = {}, params = {} } = req;
   const { id } = params;
-  const populateFields = Object.getOwnPropertyNames(references).join(' ');
+  const populateFields = Object.getOwnPropertyNames(references).join(" ");
 
   try {
     const data = await Model.findByIdAndUpdate(id, body, {
@@ -134,7 +135,7 @@ exports.delete = async (req, res, next) => {
   const { id } = params;
 
   try {
-    const populateFields = Object.getOwnPropertyNames(references).join(' ');
+    const populateFields = Object.getOwnPropertyNames(references).join(" ");
     const data = await Model.findByIdAndDelete(id).populate(populateFields);
 
     res.status(204);
