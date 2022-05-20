@@ -23,4 +23,6 @@ router
   .put(auth.auth, auth.owner, controller.update)
   .delete(auth.auth, auth.owner, controller.delete);
 
+router.route('/user/:userId').get(auth.auth, controller.getUserTasks);
+
 module.exports = router;

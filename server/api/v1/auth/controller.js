@@ -39,7 +39,7 @@ const owner = (req, res, next) => {
 
   console.log(doc);
   console.log(decoded);
-  if (doc.userId.id === decoded.id) {
+  if (doc.author._id.toString() === decoded.id) {
     next();
   } else {
     next({

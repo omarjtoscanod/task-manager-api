@@ -7,6 +7,7 @@ const { sanitizers } = require('./model');
 const auth = require('./../auth/controller');
 
 /*
+ * /api/v1/users/signin POST login
  * /api/v1/users       POST Create
  * /api/vi/users       GET Read all
  * /api/v1/users/:id   GET Read
@@ -19,7 +20,7 @@ router.route('/signin').post(controller.signIn);
 router
   .route('/')
   .get(auth.auth, controller.all)
-  .post(auth.auth, sanitizers, controller.create);
+  .post(sanitizers, controller.create);
 
 router.param('id', controller.id);
 
